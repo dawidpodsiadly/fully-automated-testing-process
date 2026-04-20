@@ -1,0 +1,5 @@
+apiVersion: v2
+name: gui
+description: Helm chart for GUI deployment
+type: application
+version: 1.0.0

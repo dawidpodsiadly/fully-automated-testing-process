@@ -1,11 +1,14 @@
 publish-images:
   stage: build
+  id_tokens:
+    GITLAB_OIDC_TOKEN:
+      aud: https://gitlab.com
   script:
-    - source .gitlab-ci/deploy/google-cloud-setup.sh
-    - docker build -t gcr.io/${GCP_PROJECT_ID}/api:latest -f app/api/Dockerfile app/api
-    - docker push gcr.io/${GCP_PROJECT_ID}/api:latest
-    - docker build -t gcr.io/${GCP_PROJECT_ID}/gui:latest -f app/gui/Dockerfile app/gui
-    - docker push gcr.io/${GCP_PROJECT_ID}/gui:latest
+    - . .gitlab-ci/deploy/google-cloud-setup.sh
+    - docker build -t ${GCP_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/apps/api:latest -f app/api/Dockerfile app/api
+    - docker push ${GCP_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/apps/api:latest
+    - docker build -t ${GCP_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/apps/gui:latest -f app/gui/Dockerfile app/gui
+    - docker push ${GCP_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/apps/gui:latest
   rules:
     - if: >-
         $DEPLOY_TEST_INSTALLATION == "true"

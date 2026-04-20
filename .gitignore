@@ -1,6 +1,7 @@
 node_modules
 .DS_Store
 app/gui/build/
+.env
 
 tests/e2e/test-results/
 tests/e2e/playwright-report/
