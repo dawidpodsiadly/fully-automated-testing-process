@@ -1,4 +1,4 @@
-apk update && apk add --no-cache curl bash python3 py3-pip
+apk update && apk add --no-cache curl bash python3 py3-pip openssl
 
 if ! command -v gcloud >/dev/null 2>&1; then
   curl -sSL https://sdk.cloud.google.com | bash
@@ -15,7 +15,11 @@ gcloud iam workload-identity-pools create-cred-config "$GCP_WIF_PROVIDER" \
 gcloud auth login --cred-file="${CI_PROJECT_DIR}/gcp-wif-credentials.json"
 
 gcloud config set project "$GCP_PROJECT_ID"
-gcloud auth configure-docker "${GCP_REGION}-docker.pkg.dev" --quiet
+if command -v docker >/dev/null 2>&1; then
+  gcloud auth configure-docker "${GCP_REGION}-docker.pkg.dev" --quiet
+else
+  echo "docker not found in PATH, skipping docker credential helper setup"
+fi
 
 gcloud components install gke-gcloud-auth-plugin --quiet
 echo "Checking if gke-gcloud-auth-plugin is installed..."
