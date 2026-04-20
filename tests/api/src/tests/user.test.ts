@@ -464,10 +464,13 @@ describe('Users Endpoints', () => {
     });
 
     it('Should return 200 and Update User as Activated Admin User - PUT /users', async () => {
-      const createUserResponse = await request(baseUrl).post('/').send(userBody(false, false)).set(adminToken);
+      const createUserResponse = await request(baseUrl)
+        .post('/')
+        .send(userBody({isAdmin: false, isActivated: false}))
+        .set(adminToken);
       const userId = createUserResponse.body.id;
 
-      const updatedUserBody = userBody(true, true);
+      const updatedUserBody = userBody({isAdmin: true, isActivated: true});
 
       const updateUserResponse = await request(baseUrl).put(`/${userId}`).send(updatedUserBody).set(adminToken);
       expect(updateUserResponse.status).toBe(200);
