@@ -5,7 +5,7 @@ metadata:
   namespace: test-installation
 spec:
   type: LoadBalancer
-  loadBalancerIP: 35.241.214.139
+  loadBalancerIP: {{ .Values.loadBalancerIP | quote }}
   selector:
     app: gui
   ports:

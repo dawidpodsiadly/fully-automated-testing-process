@@ -2,8 +2,9 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: api
+  namespace: test-installation
 spec:
-  replicas: 1
+  replicas: {{ .Values.replicas }}
   selector:
     matchLabels:
       app: api
@@ -13,7 +14,7 @@ spec:
         app: api
     spec:
       containers:
-      - name: api
-        image: gcr.io/mythic-fire-446020-d5/api:latest
-        ports:
-        - containerPort: 3050
+        - name: api
+          image: {{ .Values.image }}
+          ports:
+            - containerPort: 3050

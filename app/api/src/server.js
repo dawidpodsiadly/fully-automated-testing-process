@@ -22,7 +22,7 @@ app.use(express.json());
 app.use(passport.initialize());
 
 mongoose
-  .connect('mongodb+srv://skill1:e46lecibokiem@users.kon9j2k.mongodb.net/userManagement?retryWrites=true&w=majority&appName=Users', {})
+  .connect('mongodb+srv://skill1:e46lecibokiem@users.kon9j2k.mongodb.net/?appName=Users', {})
   .then(async () => {
     console.log('DB is connected');
     await createTestUsers();

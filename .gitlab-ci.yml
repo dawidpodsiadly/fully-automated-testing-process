@@ -29,9 +29,13 @@ variables:
       - "true"
       - "false"
 
-  GCP_PROJECT_ID: "mythic-fire-446020-d5"
-  GCP_REGION: "europe-west1"
-  GCP_CLUSTER_NAME: 'app-testing'
+  GCP_PROJECT_ID: "project-5c8acae4-cb3c-44bb-8a5"
+  GCP_REGION: "europe-central2"
+  GCP_ZONE: "europe-central2-c"
+  GCP_CLUSTER_NAME: "dawid-cluster"
+  GUI_LOAD_BALANCER_IP: "34.118.119.76"
+  GCP_WIF_PROVIDER: "projects/704516073438/locations/global/workloadIdentityPools/gitlab-pool/providers/gitlab-provider"
+  GCP_SERVICE_ACCOUNT_EMAIL: "gitlab-ci@project-5c8acae4-cb3c-44bb-8a5.iam.gserviceaccount.com"
 
 stages:
   - build

@@ -1,5 +1,5 @@
 export const defaultConfig = {
-  baseUrl: 'http://35.241.214.139',
+  baseUrl: 'http://34.118.119.76',
   userEmail: 'playwright@tests.com',
   userPassword: 'chocolate',
 };

@@ -1,4 +1,4 @@
-const baseUrl = 'http://35.241.214.139/api';
+const baseUrl = 'http://34.118.119.76/api';
 
 export class PathService {
   static readonly paths = {
