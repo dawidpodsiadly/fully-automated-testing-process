@@ -7,5 +7,6 @@ api-tests:
     - npm ci
     - npm run test:all
   rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: >-
         $RUN_API_TESTS == "true"

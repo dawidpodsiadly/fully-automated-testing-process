@@ -18,6 +18,7 @@ deploy-test-installation:
     - export CHART_VERSION=0.1.${CI_PIPELINE_IID}
     - helmfile -f deployment/helmfile/helmfile.yaml sync
   rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: $DEPLOY_TEST_INSTALLATION == "true"
   needs:
     - job: publish-images

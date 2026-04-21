@@ -17,5 +17,6 @@ publish-images:
     - docker build -t ${GCP_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/apps/gui:latest -f app/gui/Dockerfile app/gui
     - docker push ${GCP_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/apps/gui:latest
   rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: >-
         $DEPLOY_TEST_INSTALLATION == "true"
