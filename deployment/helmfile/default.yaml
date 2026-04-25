@@ -1,14 +1,24 @@
 releases:
+  - name: mongodb
+    namespace: test-installation
+    chart: ../charts/mongodb
+    values:
+      - image: mongo:7
+
   - name: api
     namespace: test-installation
     chart: oci://europe-central2-docker.pkg.dev/project-5c8acae4-cb3c-44bb-8a5/apps/helm/api
     version: '{{ env "CHART_VERSION" | default "0.1.0" }}'
     values:
-      - ../../app/api/deployment/values.yaml
+      - ../../app/api/deployment/values/default.yaml
+      - image:
+          tag: '{{ env "IMAGE_TAG" | default "latest" }}'
 
   - name: gui
     namespace: test-installation
     chart: oci://europe-central2-docker.pkg.dev/project-5c8acae4-cb3c-44bb-8a5/apps/helm/gui
     version: '{{ env "CHART_VERSION" | default "0.1.0" }}'
     values:
-      - ../../app/gui/deployment/values.yaml
+      - ../../app/gui/deployment/values/default.yaml
+      - image:
+          tag: '{{ env "IMAGE_TAG" | default "latest" }}'

@@ -1,2 +1,0 @@
-replicas: 1
-image: europe-central2-docker.pkg.dev/project-5c8acae4-cb3c-44bb-8a5/apps/api:latest

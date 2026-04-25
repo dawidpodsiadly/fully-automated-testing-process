@@ -8,6 +8,7 @@ const auth = require('./auth');
 const { createTestUsers } = require('./utils/testUsersAutoSetup');
 
 const app = express();
+require('dotenv').config();
 
 const corsOptions = {
   origin: '*',
@@ -21,8 +22,13 @@ app.use(morgan('combined'));
 app.use(express.json());
 app.use(passport.initialize());
 
+const mongoUri =
+  process.env.MONGO_URI ||
+  process.env.MONGO_CONNECTION ||
+  'mongodb+srv://skill1:e46lecibokiem@users.kon9j2k.mongodb.net/?appName=Users';
+
 mongoose
-  .connect('mongodb+srv://skill1:e46lecibokiem@users.kon9j2k.mongodb.net/?appName=Users', {})
+  .connect(mongoUri, {})
   .then(async () => {
     console.log('DB is connected');
     await createTestUsers();
