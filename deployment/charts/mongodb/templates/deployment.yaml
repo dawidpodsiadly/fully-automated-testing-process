@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: api
+  name: mongodb
   namespace: test-installation
 spec:
-  replicas: {{ .Values.replicas }}
+  replicas: 1
   selector:
     matchLabels:
-      app: api
+      app: mongodb
   template:
     metadata:
       labels:
-        app: api
+        app: mongodb
     spec:
       containers:
-        - name: api
+        - name: mongodb
           image: {{ .Values.image }}
           ports:
-            - containerPort: 3050
+            - containerPort: 27017

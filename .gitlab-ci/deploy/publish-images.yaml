@@ -8,13 +8,16 @@ publish-images:
     - curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
     - echo "$(gcloud auth print-access-token)" | helm registry login -u oauth2accesstoken --password-stdin https://${GCP_REGION}-docker.pkg.dev
     - CHART_VERSION=0.1.${CI_PIPELINE_IID}
-    - helm package app/api/deployment --version ${CHART_VERSION} --app-version ${CI_COMMIT_SHORT_SHA} -d /tmp/charts
-    - helm package app/gui/deployment --version ${CHART_VERSION} --app-version ${CI_COMMIT_SHORT_SHA} -d /tmp/charts
+    - IMAGE_TAG=${CI_PIPELINE_IID}
+    - helm package app/api/deployment/charts --version ${CHART_VERSION} --app-version ${CI_COMMIT_SHORT_SHA} -d /tmp/charts
+    - helm package app/gui/deployment/charts --version ${CHART_VERSION} --app-version ${CI_COMMIT_SHORT_SHA} -d /tmp/charts
     - helm push /tmp/charts/api-${CHART_VERSION}.tgz oci://${GCP_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/apps/helm
     - helm push /tmp/charts/gui-${CHART_VERSION}.tgz oci://${GCP_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/apps/helm
-    - docker build -t ${GCP_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/apps/api:latest -f app/api/Dockerfile app/api
+    - docker build -t ${GCP_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/apps/api:${IMAGE_TAG} -t ${GCP_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/apps/api:latest -f app/api/Dockerfile app/api
+    - docker push ${GCP_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/apps/api:${IMAGE_TAG}
     - docker push ${GCP_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/apps/api:latest
-    - docker build -t ${GCP_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/apps/gui:latest -f app/gui/Dockerfile app/gui
+    - docker build -t ${GCP_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/apps/gui:${IMAGE_TAG} -t ${GCP_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/apps/gui:latest -f app/gui/Dockerfile app/gui
+    - docker push ${GCP_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/apps/gui:${IMAGE_TAG}
     - docker push ${GCP_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/apps/gui:latest
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'

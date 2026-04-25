@@ -15,6 +15,6 @@ spec:
     spec:
       containers:
       - name: gui
-        image: {{ .Values.image }}
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
         ports:
         - containerPort: 80

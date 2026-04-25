@@ -54,20 +54,20 @@ function UserDetailsPage() {
               <strong>Birth Date:</strong> {userData.birthDate ? dateTimeFormat(userData.birthDate) : '-'}
             </p>
             <p id="user-details-contract-type">
-              <strong>Contract Type:</strong> {userData.contract.type || '-'}
+              <strong>Contract Type:</strong> {userData.contract?.type || '-'}
             </p>
             <p id="user-details-salary">
-              <strong>Salary:</strong> {userData.contract.salary || '-'}
+              <strong>Salary:</strong> {userData.contract?.salary || '-'}
             </p>
             <p id="user-details-position">
-              <strong>Position:</strong> {userData.contract.position || '-'}
+              <strong>Position:</strong> {userData.contract?.position || '-'}
             </p>
             <p id="user-details-start-time">
               <strong>Start Time:</strong>{' '}
-              {userData.contract.startTime ? dateTimeFormat(userData.contract.startTime) : '-'}
+              {userData.contract?.startTime ? dateTimeFormat(userData.contract.startTime) : '-'}
             </p>
             <p id="user-details-end-time">
-              <strong>End Time:</strong> {userData.contract.endTime ? dateTimeFormat(userData.contract.endTime) : '-'}
+              <strong>End Time:</strong> {userData.contract?.endTime ? dateTimeFormat(userData.contract.endTime) : '-'}
             </p>
             <p id="user-details-notes">
               <strong>Notes:</strong> {userData.notes || '-'}
