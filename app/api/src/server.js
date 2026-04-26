@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const passport = require('passport');
 const morgan = require('morgan');
+const { metricsMiddleware, metricsHandler } = require('./metrics');
 const userRoutes = require('./routes/userRoutes');
 const auth = require('./auth');
 const { createTestUsers } = require('./utils/testUsersAutoSetup');
@@ -21,6 +22,7 @@ app.use(cors(corsOptions));
 app.use(morgan('combined'));
 app.use(express.json());
 app.use(passport.initialize());
+app.use(metricsMiddleware);
 
 const mongoUri =
   process.env.MONGO_URI ||
@@ -35,6 +37,7 @@ mongoose
   })
   .catch(err => console.log(err));
 
+app.get('/metrics', metricsHandler);
 app.use(userRoutes);
 
 const PORT = process.env.PORT || 3050;

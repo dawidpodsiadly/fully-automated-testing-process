@@ -1,0 +1,7 @@
+replicas: 1
+
+image: mongo:7
+
+service:
+  port: 27017
+  targetPort: 27017

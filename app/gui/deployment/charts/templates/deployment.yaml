@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: gui
-  namespace: test-installation
+  namespace: {{ .Release.Namespace }}
 spec:
   replicas: {{ .Values.replicas }}
   selector:
@@ -17,4 +17,4 @@ spec:
       - name: gui
         image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
         ports:
-        - containerPort: 80
+        - containerPort: {{ .Values.service.targetPort }}

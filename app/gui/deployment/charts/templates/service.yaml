@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: gui-service
-  namespace: test-installation
+  namespace: {{ .Release.Namespace }}
 spec:
   type: LoadBalancer
   loadBalancerIP: {{ .Values.loadBalancerIP | quote }}
@@ -10,5 +10,5 @@ spec:
     app: gui
   ports:
     - protocol: TCP
-      port: 80
-      targetPort: 80
+      port: {{ .Values.service.port }}
+      targetPort: {{ .Values.service.targetPort }}

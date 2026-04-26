@@ -12,12 +12,15 @@ deploy-test-installation:
     - curl -fsSL "https://github.com/helmfile/helmfile/releases/download/v${HELMFILE_VERSION}/helmfile_${HELMFILE_VERSION}_linux_amd64.tar.gz" -o /tmp/helmfile.tar.gz
     - tar -xzf /tmp/helmfile.tar.gz -C /tmp helmfile
     - install /tmp/helmfile /usr/local/bin/helmfile
+    - helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+    - helm repo update
     - echo "$(gcloud auth print-access-token)" | helm registry login -u oauth2accesstoken --password-stdin https://${GCP_REGION}-docker.pkg.dev
     - gcloud container clusters get-credentials "${GCP_CLUSTER_NAME}" --zone "${GCP_ZONE}" --project "${GCP_PROJECT_ID}"
     - kubectl create namespace test-installation --dry-run=client -o yaml | kubectl apply -f -
+    - helm dependency build deployment/charts/monitoring
     - export CHART_VERSION=0.1.${CI_PIPELINE_IID}
     - export IMAGE_TAG=${CI_PIPELINE_IID}
-    - helmfile -f deployment/helmfile/default.yaml sync
+    - helmfile -f deployment/helmfile/test-installation.yaml sync
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: $DEPLOY_TEST_INSTALLATION == "true"

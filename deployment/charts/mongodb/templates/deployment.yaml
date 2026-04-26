@@ -2,9 +2,9 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mongodb
-  namespace: test-installation
+  namespace: {{ .Release.Namespace }}
 spec:
-  replicas: 1
+  replicas: {{ .Values.replicas }}
   selector:
     matchLabels:
       app: mongodb
@@ -17,4 +17,4 @@ spec:
         - name: mongodb
           image: {{ .Values.image }}
           ports:
-            - containerPort: 27017
+            - containerPort: {{ .Values.service.targetPort }}
