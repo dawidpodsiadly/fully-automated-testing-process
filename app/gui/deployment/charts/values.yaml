@@ -1,5 +1,9 @@
 replicas: 1
+
 image:
   repository: europe-central2-docker.pkg.dev/project-5c8acae4-cb3c-44bb-8a5/apps/gui
   tag: latest
-loadBalancerIP: "34.118.119.76"
+
+service:
+  port: 80
+  targetPort: 80

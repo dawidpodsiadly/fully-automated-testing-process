@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: api
-  namespace: test-installation
+  namespace: {{ .Release.Namespace }}
 spec:
   replicas: {{ .Values.replicas }}
   selector:
@@ -20,4 +20,5 @@ spec:
             - name: MONGO_URI
               value: {{ .Values.mongoUri | quote }}
           ports:
-            - containerPort: 3050
+            - name: {{ .Values.service.portName }}
+              containerPort: {{ .Values.service.targetPort }}

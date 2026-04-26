@@ -1,5 +1,12 @@
 replicas: 1
+
 image:
   repository: europe-central2-docker.pkg.dev/project-5c8acae4-cb3c-44bb-8a5/apps/api
   tag: latest
+
 mongoUri: mongodb://mongodb:27017/users
+
+service:
+  port: 80
+  targetPort: 3050
+  portName: http

@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ .Release.Name }}-grafana-dashboards"
+  namespace: "{{ .Release.Namespace }}"
+  labels:
+    app.kubernetes.io/name: monitoring
+    app.kubernetes.io/instance: "{{ .Release.Name }}"
+    grafana_dashboard: "1"
+data:
+  api-overview.json: |
+{{ .Files.Get "dashboards/api-overview.json" | indent 4 }}
