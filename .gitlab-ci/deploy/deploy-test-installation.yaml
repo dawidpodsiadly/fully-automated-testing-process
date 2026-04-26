@@ -12,6 +12,8 @@ deploy-test-installation:
     - curl -fsSL "https://github.com/helmfile/helmfile/releases/download/v${HELMFILE_VERSION}/helmfile_${HELMFILE_VERSION}_linux_amd64.tar.gz" -o /tmp/helmfile.tar.gz
     - tar -xzf /tmp/helmfile.tar.gz -C /tmp helmfile
     - install /tmp/helmfile /usr/local/bin/helmfile
+    - helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+    - helm repo update
     - echo "$(gcloud auth print-access-token)" | helm registry login -u oauth2accesstoken --password-stdin https://${GCP_REGION}-docker.pkg.dev
     - gcloud container clusters get-credentials "${GCP_CLUSTER_NAME}" --zone "${GCP_ZONE}" --project "${GCP_PROJECT_ID}"
     - kubectl create namespace test-installation --dry-run=client -o yaml | kubectl apply -f -
