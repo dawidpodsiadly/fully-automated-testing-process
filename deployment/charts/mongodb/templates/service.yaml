@@ -2,10 +2,10 @@ apiVersion: v1
 kind: Service
 metadata:
   name: mongodb
-  namespace: test-installation
+  namespace: {{ .Release.Namespace }}
 spec:
   selector:
     app: mongodb
   ports:
-    - port: 27017
-      targetPort: 27017
+    - port: {{ .Values.service.port }}
+      targetPort: {{ .Values.service.targetPort }}
