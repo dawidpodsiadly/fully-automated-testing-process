@@ -1,7 +1,8 @@
 import request from 'supertest';
 import {PathService} from '../services/path-service';
 import {authService} from '../services/auth-service';
-import {userBody} from '../utils/bodies.util';
+import {ContractType, Position, userBody} from '../factories/user.factory';
+import {authBody} from '../factories/auth.factory';
 import {TestUsers} from '../services/auth-service';
 import {testPassword} from '../services/auth-service';
 import {randomUtil} from '../utils/random.util';
@@ -164,13 +165,14 @@ describe('Users Endpoints', () => {
     it('Should return 400 when Contract End Time is earlier than Start Time - POST /users', async () => {
       const contractStartTime = '1939-09-10';
       const contractEndTime = '1410-07-15';
+      const requestBody = userBody();
 
       const response = await request(baseUrl)
         .post('/')
         .send({
-          ...userBody(),
+          ...requestBody,
           contract: {
-            ...userBody().contract,
+            ...requestBody.contract,
             startTime: contractStartTime,
             endTime: contractEndTime,
           },
@@ -190,66 +192,101 @@ describe('Users Endpoints', () => {
       expect(response.body.message).toEqual(`User has been created with id = ${response.body.id}`);
     });
 
+    it.each(Object.values(ContractType))(
+      'Should return 200 and Create new User with Contract Type `%s` - POST /users',
+      async contractType => {
+        const requestBody = userBody({
+          contract: {
+            ...userBody().contract,
+            type: contractType,
+          },
+        });
+
+        const response = await request(baseUrl).post('/').send(requestBody).set(adminToken);
+        expect(response.status).toBe(200);
+
+        const userId = response.body.id;
+        const getUserResponse = await request(baseUrl).get(`/${userId}`).set(adminToken);
+        expect(getUserResponse.status).toBe(200);
+        expect(getUserResponse.body.contract.type).toEqual(contractType);
+      },
+    );
+
+    it.each(Object.values(Position))(
+      'Should return 200 and Create new User with Position `%s` - POST /users',
+      async position => {
+        const requestBody = userBody({
+          contract: {
+            ...userBody().contract,
+            position,
+          },
+        });
+
+        const response = await request(baseUrl).post('/').send(requestBody).set(adminToken);
+        expect(response.status).toBe(200);
+
+        const userId = response.body.id;
+        const getUserResponse = await request(baseUrl).get(`/${userId}`).set(adminToken);
+        expect(getUserResponse.status).toBe(200);
+        expect(getUserResponse.body.contract.position).toEqual(position);
+      },
+    );
+
     it('Should return 400 when Required Field is Missing (Name, Surname, Email, Password) - POST /users', async () => {
-      let userBody = {
+      let requestBody = userBody({
         name: '',
         surname: '',
         email: '',
         password: randomUtil.randomName(9),
-      };
+      });
 
-      let response = await request(baseUrl).post('/').send(userBody).set(adminToken);
+      let response = await request(baseUrl).post('/').send(requestBody).set(adminToken);
       expect(response.status).toBe(400);
       expect(response.body.message).toEqual(
         'User validation failed: name: Path `name` is required., surname: Path `surname` is required., email: Path `email` is required.',
       );
 
-      userBody.name = randomUtil.randomNameWithPrefix();
+      requestBody.name = randomUtil.randomNameWithPrefix();
 
-      response = await request(baseUrl).post('/').send(userBody).set(adminToken);
+      response = await request(baseUrl).post('/').send(requestBody).set(adminToken);
       expect(response.status).toBe(400);
       expect(response.body.message).toEqual(
         'User validation failed: surname: Path `surname` is required., email: Path `email` is required.',
       );
 
-      userBody.surname = randomUtil.randomNameWithPrefix();
+      requestBody.surname = randomUtil.randomNameWithPrefix();
 
-      response = await request(baseUrl).post('/').send(userBody).set(adminToken);
+      response = await request(baseUrl).post('/').send(requestBody).set(adminToken);
       expect(response.status).toBe(400);
       expect(response.body.message).toEqual('User validation failed: email: Path `email` is required.');
 
-      userBody.email = randomUtil.randomEmail();
-      userBody.password = '';
+      requestBody.email = randomUtil.randomEmail();
+      requestBody.password = '';
 
-      response = await request(baseUrl).post('/').send(userBody).set(adminToken);
+      response = await request(baseUrl).post('/').send(requestBody).set(adminToken);
       expect(response.status).toBe(400);
       expect(response.body.message).toEqual('Password must be at least 9 characters long');
 
-      userBody.password = randomUtil.randomName(9);
+      requestBody.password = randomUtil.randomName(9);
 
-      response = await request(baseUrl).post('/').send(userBody).set(adminToken);
+      response = await request(baseUrl).post('/').send(requestBody).set(adminToken);
       expect(response.status).toBe(200);
     });
 
     it('Should return 200 and isAdmin and isActivated Should be `false` when Not Passed - POST /users', async () => {
-      let userBody = {
-        name: randomUtil.randomNameWithPrefix(),
-        surname: randomUtil.randomNameWithPrefix(),
-        email: randomUtil.randomEmail(),
-        password: randomUtil.randomName(),
-      };
+      const {isAdmin, isActivated, ...requestBody} = userBody();
 
-      const createUserResponse = await request(baseUrl).post('/').send(userBody).set(adminToken);
+      const createUserResponse = await request(baseUrl).post('/').send(requestBody).set(adminToken);
       const userId = createUserResponse.body.id;
       expect(createUserResponse.status).toBe(200);
       expect(createUserResponse.body).toHaveProperty('id');
       expect(createUserResponse.body.message).toEqual(`User has been created with id = ${userId}`);
 
-      const getUserResponse = await request(baseUrl).get(`/${userId}`).send(userBody).set(adminToken);
+      const getUserResponse = await request(baseUrl).get(`/${userId}`).send(requestBody).set(adminToken);
       expect(getUserResponse.status).toBe(200);
-      expect(getUserResponse.body.name).toEqual(userBody.name);
-      expect(getUserResponse.body.surname).toEqual(userBody.surname);
-      expect(getUserResponse.body.email).toEqual(userBody.email);
+      expect(getUserResponse.body.name).toEqual(requestBody.name);
+      expect(getUserResponse.body.surname).toEqual(requestBody.surname);
+      expect(getUserResponse.body.email).toEqual(requestBody.email);
       expect(getUserResponse.body.isAdmin).toEqual(false);
       expect(getUserResponse.body.isActivated).toEqual(false);
       expect(getUserResponse.body).toHaveProperty('lastUpdated');
@@ -298,31 +335,29 @@ describe('Users Endpoints', () => {
     });
 
     it('lastUpdated Field Should Be Set to Date.now even if Field passed in request - POST /users', async () => {
-      let userBody = {
-        name: randomUtil.randomNameWithPrefix(),
-        surname: randomUtil.randomNameWithPrefix(),
-        email: randomUtil.randomEmail(),
-        password: randomUtil.randomName(),
+      const requestBody = {
+        ...userBody(),
         lastUpdated: '1920-08-12',
       };
 
-      const createUserResponse = await request(baseUrl).post('/').send(userBody).set(adminToken);
+      const createUserResponse = await request(baseUrl).post('/').send(requestBody).set(adminToken);
       const userId = createUserResponse.body.id;
       expect(createUserResponse.status).toBe(200);
 
       const getUserResponse = await request(baseUrl).get(`/${userId}`).set(adminToken);
-      expect(getUserResponse.body.lastUpdated).not.toEqual(userBody.lastUpdated);
+      expect(getUserResponse.body.lastUpdated).not.toEqual(requestBody.lastUpdated);
     });
 
     it('Should return 400 when Trying to add Position Filled other than Storekeeper, Accountant, IT - POST /users', async () => {
       const notExistingContractPosition = randomUtil.randomName();
+      const requestBody = userBody();
 
       const response = await request(baseUrl)
         .post('/')
         .send({
-          ...userBody(),
+          ...requestBody,
           contract: {
-            ...userBody().contract,
+            ...requestBody.contract,
             position: notExistingContractPosition,
           },
         })
@@ -334,13 +369,14 @@ describe('Users Endpoints', () => {
 
     it('Should return 400 when Trying to add Contract Type Filled other than Employment, Mandate, B2B - POST /users', async () => {
       const notExistingContractType = randomUtil.randomName();
+      const requestBody = userBody();
 
       const response = await request(baseUrl)
         .post('/')
         .send({
-          ...userBody(),
+          ...requestBody,
           contract: {
-            ...userBody().contract,
+            ...requestBody.contract,
             type: notExistingContractType,
           },
         })
@@ -353,10 +389,13 @@ describe('Users Endpoints', () => {
       const notDateBirthDate = randomUtil.randomName();
       const notDateContractStartTime = randomUtil.randomName();
       const notDateContractEndTime = randomUtil.randomName();
+      const invalidBirthDateBody = userBody();
+      const invalidContractStartBody = userBody();
+      const invalidContractEndBody = userBody();
 
       let response = await request(baseUrl)
         .post('/')
-        .send({...userBody(), birthDate: notDateBirthDate})
+        .send({...invalidBirthDateBody, birthDate: notDateBirthDate})
         .set(adminToken);
 
       expect(response.status).toBe(400);
@@ -365,9 +404,9 @@ describe('Users Endpoints', () => {
       response = await request(baseUrl)
         .post('/')
         .send({
-          ...userBody(),
+          ...invalidContractStartBody,
           contract: {
-            ...userBody().contract,
+            ...invalidContractStartBody.contract,
             startTime: notDateContractStartTime,
           },
         })
@@ -379,9 +418,9 @@ describe('Users Endpoints', () => {
       response = await request(baseUrl)
         .post('/')
         .send({
-          ...userBody(),
+          ...invalidContractEndBody,
           contract: {
-            ...userBody().contract,
+            ...invalidContractEndBody.contract,
             startTime: notDateContractEndTime,
           },
         })
@@ -496,6 +535,68 @@ describe('Users Endpoints', () => {
       expect(getUserResponse.body.isActivated).toEqual(updatedUserBody.isActivated);
       expect(getUserResponse.body._id).toEqual(userId);
       expect(getUserResponse.body).toHaveProperty('lastUpdated');
+    });
+
+    it('Should return 200 and Update only Selected Field without Changing the Rest - PUT /users', async () => {
+      const initialUserBody = userBody();
+      const createUserResponse = await request(baseUrl).post('/').send(initialUserBody).set(adminToken);
+      const userId = createUserResponse.body.id;
+      const updatedPhoneNumber = '123456789';
+
+      const updateUserResponse = await request(baseUrl)
+        .put(`/${userId}`)
+        .send({phoneNumber: updatedPhoneNumber})
+        .set(adminToken);
+      expect(updateUserResponse.status).toBe(200);
+
+      const getUserResponse = await request(baseUrl).get(`/${userId}`).set(adminToken);
+      expect(getUserResponse.status).toBe(200);
+      expect(getUserResponse.body.phoneNumber).toEqual(updatedPhoneNumber);
+      expect(getUserResponse.body.name).toEqual(initialUserBody.name);
+      expect(getUserResponse.body.surname).toEqual(initialUserBody.surname);
+      expect(getUserResponse.body.email).toEqual(initialUserBody.email);
+      expect(getUserResponse.body.birthDate).toContain(initialUserBody.birthDate);
+      expect(getUserResponse.body.contract.type).toEqual(initialUserBody.contract.type);
+      expect(getUserResponse.body.contract.salary).toEqual(initialUserBody.contract.salary);
+      expect(getUserResponse.body.contract.position).toEqual(initialUserBody.contract.position);
+      expect(getUserResponse.body.contract.startTime).toContain(initialUserBody.contract.startTime);
+      expect(getUserResponse.body.contract.endTime).toContain(initialUserBody.contract.endTime);
+      expect(getUserResponse.body.notes).toEqual(initialUserBody.notes);
+      expect(getUserResponse.body.isAdmin).toEqual(initialUserBody.isAdmin);
+      expect(getUserResponse.body.isActivated).toEqual(initialUserBody.isActivated);
+    });
+
+    it('Should return 200 and Allow Login with Updated Password Only - PUT /users', async () => {
+      const initialPassword = randomUtil.randomName(12);
+      const newPassword = randomUtil.randomName(13);
+      const requestBody = userBody({password: initialPassword});
+      const createUserResponse = await request(baseUrl).post('/').send(requestBody).set(adminToken);
+      const userId = createUserResponse.body.id;
+
+      const updateUserResponse = await request(baseUrl).put(`/${userId}`).send({password: newPassword}).set(adminToken);
+      expect(updateUserResponse.status).toBe(200);
+
+      const oldPasswordLoginResponse = await request(PathService.paths.auth)
+        .post('/')
+        .send(
+          authBody({
+            email: requestBody.email,
+            password: initialPassword,
+          }),
+        );
+      expect(oldPasswordLoginResponse.status).toBe(401);
+      expect(oldPasswordLoginResponse.body.message).toContain('Invalid email or password');
+
+      const newPasswordLoginResponse = await request(PathService.paths.auth)
+        .post('/')
+        .send(
+          authBody({
+            email: requestBody.email,
+            password: newPassword,
+          }),
+        );
+      expect(newPasswordLoginResponse.status).toBe(200);
+      expect(newPasswordLoginResponse.body).toHaveProperty('token');
     });
 
     it('Should return 400 when Phone Number `< 9` or `> 14` - PUT /users', async () => {
