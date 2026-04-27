@@ -36,9 +36,7 @@ function CreateUserPage() {
       try {
         const response = await apis.getAllUsers();
         setUsers(response.data);
-      } catch (err) {
-        console.error('Error fetching users:', err);
-      }
+      } catch {}
     };
     fetchUsers();
   }, []);
@@ -112,11 +110,10 @@ function CreateUserPage() {
 
     apis
       .insertUser(userData)
-      .then(res => {
-        console.log(res);
+      .then(() => {
         navigate('/');
       })
-      .catch(err => console.log(err));
+      .catch(() => undefined);
   };
 
   return (

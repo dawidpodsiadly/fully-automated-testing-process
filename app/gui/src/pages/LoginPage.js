@@ -38,7 +38,6 @@ function LoginPage() {
         navigate(`/userDetails/${userId}`);
       }
     } catch (error) {
-      console.error('Error:', error);
       if (error.response) {
         if (error.response.status === 403) {
           setError('Your account has been deactivated. Please contact your administrator.');

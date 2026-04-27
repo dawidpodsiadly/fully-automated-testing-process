@@ -33,9 +33,7 @@ function UsersPage() {
         lastUpdated: dateTimeFormat(user.lastUpdated, true),
       }));
       setUsers(formattedUsers);
-    } catch (error) {
-      console.error('Error fetching users:', error);
-    }
+    } catch {}
   }, [currentPage, itemsPerPage]);
 
   useEffect(() => {
@@ -54,9 +52,7 @@ function UsersPage() {
     try {
       await api.updateUserById(userId, {isActivated: isActivated});
       await fetchData();
-    } catch (error) {
-      console.log(error);
-    }
+    } catch {}
   };
 
   const handleDelete = id => {
@@ -72,17 +68,13 @@ function UsersPage() {
       await api.deleteUserById(id);
       await fetchData();
       setConfirmDeleteId(null);
-    } catch (error) {
-      console.log(error);
-    }
+    } catch {}
   };
 
   const handleMassDelete = async () => {
     try {
       setConfirmMassDelete(true);
-    } catch (error) {
-      console.log(error);
-    }
+    } catch {}
   };
 
   const handleConfirmMassDelete = async () => {
@@ -91,9 +83,7 @@ function UsersPage() {
       await fetchData();
       setSelectedUsers([]);
       setConfirmMassDelete(false);
-    } catch (error) {
-      console.log(error);
-    }
+    } catch {}
   };
 
   const handleNextPage = () => {

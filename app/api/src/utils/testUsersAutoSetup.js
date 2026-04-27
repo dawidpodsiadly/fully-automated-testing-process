@@ -10,19 +10,12 @@ const usersToCreate = [
 const PASSWORD = 'chocolate';
 
 const createTestUsers = async () => {
-  try {
-    for (const userData of usersToCreate) {
-      const existingUser = await UserModel.findOne({ email: userData.email });
+  for (const userData of usersToCreate) {
+    const existingUser = await UserModel.findOne({ email: userData.email });
 
-      if (!existingUser) {
-        await UserModel.create({ ...userData, password: PASSWORD });
-        console.log(`User ${userData.email} created`);
-      } else {
-        console.log(`User ${userData.email} already exists`);
-      }
+    if (!existingUser) {
+      await UserModel.create({ ...userData, password: PASSWORD });
     }
-  } catch (error) {
-    console.error('Error creating users:', error.message);
   }
 };
 

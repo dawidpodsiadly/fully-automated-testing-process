@@ -12,7 +12,7 @@ userController.getAllUsers = async (req, res) => {
       return res.status(403).json({message: 'Unauthorized: Only administrators can perform this action'});
     }
 
-    const users = await UserModel.find();
+    const users = await UserModel.find().select('-password');
     res.json(users);
   } catch (error) {
     res.status(500).json({message: error.message});
@@ -27,7 +27,7 @@ userController.getUserById = async (req, res) => {
       return res.status(400).json({message: 'Invalid user ID format'});
     }
 
-    const user = await UserModel.findById(userId);
+    const user = await UserModel.findById(userId).select('-password');
 
     if (!user) {
       return res.status(404).json({message: `User with id = ${userId} not found`});

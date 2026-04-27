@@ -2,7 +2,7 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 
 const api = axios.create({
-  baseURL: '/api',  
+  baseURL: '/api',
 });
 
 api.interceptors.request.use(
@@ -11,24 +11,14 @@ api.interceptors.request.use(
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`;
     }
-    console.log(`Request to ${config.url} with payload:`, config.data);
     return config;
   },
-  error => {
-    console.error('Request error:', error);
-    return Promise.reject(error);
-  },
+  error => Promise.reject(error),
 );
 
 api.interceptors.response.use(
-  response => {
-    console.log(`Response from ${response.config.url}:`, response.data);
-    return response;
-  },
-  error => {
-    console.error('Response error:', error);
-    return Promise.reject(error);
-  }
+  response => response,
+  error => Promise.reject(error),
 );
 
 const apis = {

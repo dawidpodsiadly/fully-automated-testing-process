@@ -55,9 +55,7 @@ function UpdateUserPage() {
         setEndTime(formatDate(userData.contract.endTime));
         setIsAdmin(userData.isAdmin);
         setAllUsers(usersResponse.data);
-      } catch (err) {
-        console.log(err);
-      }
+      } catch {}
     };
     fetchData();
   }, [id]);
@@ -136,11 +134,10 @@ function UpdateUserPage() {
 
     apis
       .updateUserById(id, userData)
-      .then(res => {
-        console.log(res);
+      .then(() => {
         navigate('/');
       })
-      .catch(err => console.log(err));
+      .catch(() => undefined);
   };
 
   return (

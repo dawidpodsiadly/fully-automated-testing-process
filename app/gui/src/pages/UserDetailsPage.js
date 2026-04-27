@@ -14,9 +14,7 @@ function UserDetailsPage() {
       try {
         const response = await apis.getUserById(id);
         setUserData(response.data);
-      } catch (error) {
-        console.error('Error fetching user data:', error);
-      }
+      } catch {}
     };
 
     fetchUserData();
