@@ -8,7 +8,7 @@
     "test:user-creator": "playwright test src/tests/user-creator",
     "test:user-table": "playwright test src/tests/user-table",
     "test:all": "npx playwright test",
-    "test:format-and-lint": "prettier --write ."
+    "test:format-and-lint": "npx prettier --write . && tslint -p tsconfig.json --fix"
   },
   "scriptsComments": {
     "test:login-page": "Run Playwright tests for the login page, located in src/tests/login-page",

@@ -1,5 +1,5 @@
 import {faker} from '@faker-js/faker';
-import {ApiUserContractPositions, ApiUserContractTypes} from '../api/users-api';
+import {UserContractPosition, UserContractType} from '../types/user.types';
 
 export const bigLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 export const smallLetters = 'abcdefghijklmnopqrstuvwxyz';
@@ -64,14 +64,14 @@ export class RandomUtil {
     return `e2e_${this.randomName(10, smallLetters)}@e2e.pl`;
   }
 
-  randomUserContractType(): ApiUserContractTypes {
-    const contractTypes = Object.values(ApiUserContractTypes);
+  randomUserContractType(): UserContractType {
+    const contractTypes = Object.values(UserContractType);
     const randomIndex = this.randomInt(contractTypes.length);
     return contractTypes[randomIndex];
   }
 
-  randomUserPosition(): ApiUserContractPositions {
-    const positions = Object.values(ApiUserContractPositions);
+  randomUserPosition(): UserContractPosition {
+    const positions = Object.values(UserContractPosition);
     const randomIndex = this.randomInt(positions.length);
     return positions[randomIndex];
   }

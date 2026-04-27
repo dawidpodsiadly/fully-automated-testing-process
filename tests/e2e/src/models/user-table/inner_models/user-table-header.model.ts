@@ -3,27 +3,16 @@ import {Page, Locator} from '@playwright/test';
 export class UserHeader {
   readonly page: Page;
   readonly mainLocator: Locator;
-
-  readonly inputs: {
-    searchInput: Locator;
-  };
-
-  readonly buttons: {
-    addUserButton: Locator;
-    logoutButton: Locator;
-  };
+  readonly searchInput: Locator;
+  readonly addUserButton: Locator;
+  readonly logoutButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
     this.mainLocator = this.page.locator('#users-table-header');
 
-    this.inputs = {
-      searchInput: this.mainLocator.locator('#search-input'),
-    };
-
-    this.buttons = {
-      addUserButton: this.mainLocator.locator('#add-user-button'),
-      logoutButton: this.mainLocator.locator('#logout-button'),
-    };
+    this.searchInput = this.mainLocator.locator('#search-input');
+    this.addUserButton = this.mainLocator.locator('#add-user-button');
+    this.logoutButton = this.mainLocator.locator('#logout-button');
   }
 }

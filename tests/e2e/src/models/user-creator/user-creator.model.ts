@@ -1,136 +1,86 @@
-import {Page, Locator} from '@playwright/test';
-import {setText} from '../../utils/input.utils';
-import {ApiUserContractPositions, ApiUserContractTypes} from '../../api/users-api';
+import {expect, Page, Locator} from '@playwright/test';
 import {NavigationPaths, navigationService} from '../../services/navigation.service';
-
-export interface CreateUserData {
-  name: string;
-  surname: string;
-  email: string;
-  password: string;
-  phoneNumber?: string;
-  birthDate?: string;
-  contract?: {
-    type?: ApiUserContractTypes;
-    salary?: string;
-    position?: ApiUserContractPositions;
-    startTime?: string;
-    endTime?: string;
-  };
-  age?: string;
-  notes?: string;
-  isAdmin?: boolean;
-  isActivated?: boolean;
-}
+import {UserData} from '../../types/user.types';
 
 export class UserCreator {
   readonly page: Page;
   readonly mainLocator: Locator;
 
-  readonly inputs: {
-    name: Locator;
-    surname: Locator;
-    email: Locator;
-    password: Locator;
-    confirmPassword: Locator;
-    phoneNumber: Locator;
-    birthDate: Locator;
-    position: Locator;
-    salary: Locator;
-    contractType: Locator;
-    startTime: Locator;
-    endTime: Locator;
-    notes: Locator;
-    isActivated: Locator;
-    isAdmin: Locator;
-  };
+  readonly nameInput: Locator;
+  readonly surnameInput: Locator;
+  readonly emailInput: Locator;
+  readonly passwordInput: Locator;
+  readonly confirmPasswordInput: Locator;
+  readonly phoneNumberInput: Locator;
+  readonly birthDateInput: Locator;
+  readonly positionSelect: Locator;
+  readonly salaryInput: Locator;
+  readonly contractTypeSelect: Locator;
+  readonly startTimeInput: Locator;
+  readonly endTimeInput: Locator;
+  readonly notesInput: Locator;
+  readonly isActivatedCheckbox: Locator;
+  readonly isAdminCheckbox: Locator;
 
-  readonly locators: {
-    submit: Locator;
-    cancel: Locator;
-  };
-
-  readonly errors: {
-    requiredName: Locator;
-    requiredSurname: Locator;
-    requiredEmail: Locator;
-    emailExists: Locator;
-    requiredPassword: Locator;
-    matchPasswords: Locator;
-    shortPassword: Locator;
-    phoneNumberNotExist: Locator;
-    salaryMustBeNumber: Locator;
-    endDateAfterStartDate: Locator;
-  };
+  readonly submitButton: Locator;
+  readonly cancelButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
     this.mainLocator = this.page.locator('#create-user-form');
 
-    this.inputs = {
-      name: this.mainLocator.locator('#name'),
-      surname: this.mainLocator.locator('#surname'),
-      email: this.mainLocator.locator('#email'),
-      password: this.mainLocator.locator('#password'),
-      confirmPassword: this.mainLocator.locator('#confirmPassword'),
-      phoneNumber: this.mainLocator.locator('#phoneNumber'),
-      birthDate: this.mainLocator.locator('#birthDate'),
-      position: this.mainLocator.locator('#position'),
-      salary: this.mainLocator.locator('#salary'),
-      contractType: this.mainLocator.locator('#contractType'),
-      startTime: this.mainLocator.locator('#startTime'),
-      endTime: this.mainLocator.locator('#endTime'),
-      notes: this.mainLocator.locator('#notes'),
-      isActivated: this.mainLocator.locator('#isActivated'),
-      isAdmin: this.mainLocator.locator('#isAdmin'),
-    };
-
-    this.locators = {
-      submit: this.mainLocator.locator('#submit-button'),
-      cancel: this.mainLocator.locator('#cancel-button'),
-    };
-
-    this.errors = {
-      requiredName: this.mainLocator.locator('p.text-danger', {hasText: 'User Name is required'}),
-      requiredSurname: this.mainLocator.locator('p.text-danger', {hasText: 'Surname is required'}),
-      requiredEmail: this.mainLocator.locator('p.text-danger', {hasText: 'Email  is required'}),
-      emailExists: this.mainLocator.locator('p.text-danger', {hasText: 'Email already exists'}),
-      requiredPassword: this.mainLocator.locator('p.text-danger', {hasText: 'Password is required'}),
-      matchPasswords: this.mainLocator.locator('p.text-danger', {hasText: 'Passwords must match'}),
-      shortPassword: this.mainLocator.locator('p.text-danger', {hasText: 'Password must be at least 9 characters long'}),
-      phoneNumberNotExist: this.mainLocator.locator('p.text-danger', {hasText: 'Your phone number does not exist'}),
-      salaryMustBeNumber: this.mainLocator.locator('p.text-danger', {hasText: 'Salary must be a number'}),
-      endDateAfterStartDate: this.mainLocator.locator('p.text-danger', {hasText: 'End date must be after start date'}),
-    };
+    this.nameInput = this.mainLocator.locator('#name');
+    this.surnameInput = this.mainLocator.locator('#surname');
+    this.emailInput = this.mainLocator.locator('#email');
+    this.passwordInput = this.mainLocator.locator('#password');
+    this.confirmPasswordInput = this.mainLocator.locator('#confirmPassword');
+    this.phoneNumberInput = this.mainLocator.locator('#phoneNumber');
+    this.birthDateInput = this.mainLocator.locator('#birthDate');
+    this.positionSelect = this.mainLocator.locator('#position');
+    this.salaryInput = this.mainLocator.locator('#salary');
+    this.contractTypeSelect = this.mainLocator.locator('#contractType');
+    this.startTimeInput = this.mainLocator.locator('#startTime');
+    this.endTimeInput = this.mainLocator.locator('#endTime');
+    this.notesInput = this.mainLocator.locator('#notes');
+    this.isActivatedCheckbox = this.mainLocator.locator('#isActivated');
+    this.isAdminCheckbox = this.mainLocator.locator('#isAdmin');
+    this.submitButton = this.mainLocator.locator('#submit-button');
+    this.cancelButton = this.mainLocator.locator('#cancel-button');
   }
 
-  async fillUserForm(userData: CreateUserData) {
-    await setText(this.inputs.name, userData.name);
-    await setText(this.inputs.surname, userData.surname);
-    await setText(this.inputs.email, userData.email);
-    await setText(this.inputs.password, userData.password);
-    await setText(this.inputs.confirmPassword, userData.password);
+  async fillAndSubmitUserForm(userData: UserData) {
+    await this.nameInput.fill(userData.name);
+    await this.surnameInput.fill(userData.surname);
+    await this.emailInput.fill(userData.email);
+    await this.passwordInput.fill(userData.password);
+    await this.confirmPasswordInput.fill(userData.password);
 
-    userData.phoneNumber ? await setText(this.inputs.phoneNumber, userData.phoneNumber) : null;
-    userData.birthDate ? await setText(this.inputs.birthDate, userData.birthDate) : null;
-    userData.contract?.position ? await this.inputs.position.selectOption(userData.contract.position) : null;
-    userData.contract?.salary ? await setText(this.inputs.salary, userData.contract.salary) : null;
-    userData.contract?.type ? await this.inputs.contractType.selectOption(userData.contract.type) : null;
-    userData.contract?.startTime ? await setText(this.inputs.startTime, userData.contract.startTime) : null;
-    userData.contract?.endTime ? await setText(this.inputs.endTime, userData.contract.endTime) : null;
-    userData.notes ? await setText(this.inputs.notes, userData.notes) : null;
+    userData.phoneNumber ? await this.phoneNumberInput.fill(userData.phoneNumber) : null;
+    userData.birthDate ? await this.birthDateInput.fill(userData.birthDate) : null;
+    userData.contract?.position ? await this.positionSelect.selectOption(userData.contract.position) : null;
+    userData.contract?.salary ? await this.salaryInput.fill(userData.contract.salary) : null;
+    userData.contract?.type ? await this.contractTypeSelect.selectOption(userData.contract.type) : null;
+    userData.contract?.startTime ? await this.startTimeInput.fill(userData.contract.startTime) : null;
+    userData.contract?.endTime ? await this.endTimeInput.fill(userData.contract.endTime) : null;
+    userData.notes ? await this.notesInput.fill(userData.notes) : null;
 
-    const isActivatedChecked = await this.inputs.isActivated.isChecked();
-    userData.isActivated !== undefined && isActivatedChecked !== userData.isActivated && (await this.inputs.isActivated.click());
+    if (userData.isActivated !== undefined) {
+      await this.isActivatedCheckbox.setChecked(userData.isActivated);
+    }
 
-    const isAdminChecked = await this.inputs.isAdmin.isChecked();
-    userData.isAdmin !== undefined && isAdminChecked !== userData.isAdmin && (await this.inputs.isAdmin.click());
+    if (userData.isAdmin !== undefined) {
+      await this.isAdminCheckbox.setChecked(userData.isAdmin);
+    }
 
     await this.submitForm();
     await this.page.waitForURL(await navigationService.resolvePath(NavigationPaths.USER_TABLE));
   }
 
+  async expectError(errorText: string) {
+    await expect(this.page.locator('p.text-danger', {hasText: errorText})).toBeVisible();
+  }
+
   async submitForm() {
-    await this.locators.submit.click();
+    await this.submitButton.click();
   }
 }

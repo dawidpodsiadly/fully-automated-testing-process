@@ -1,67 +1,60 @@
 import {Locator, expect} from '@playwright/test';
-import {CreateUserData} from '../../user-creator/user-creator.model';
-import {todaysDate} from '../../../utils/date.utils';
+import {todaysFormattedDate} from '../../../utils/date.utils';
+import {UserData} from '../../../types/user.types';
 
 export class UserTableRow {
   readonly mainLocator: Locator;
 
-  readonly userData: {
-    checkbox: Locator;
-    status: Locator;
-    name: Locator;
-    email: Locator;
-    phoneNumber: Locator;
-    contractType: Locator;
-    startTime: Locator;
-    endTime: Locator;
-    position: Locator;
-    lastUpdated: Locator;
-  };
+  readonly userCheckbox: Locator;
+  readonly userStatusText: Locator;
+  readonly userNameText: Locator;
+  readonly userEmailText: Locator;
+  readonly userPhoneNumberText: Locator;
+  readonly userContractTypeText: Locator;
+  readonly userStartTimeText: Locator;
+  readonly userEndTimeText: Locator;
+  readonly userPositionText: Locator;
+  readonly userLastUpdatedText: Locator;
 
-  readonly actions: {
-    update: Locator;
-    delete: Locator;
-    activation: Locator;
-  };
+  readonly updateButton: Locator;
+  readonly deleteButton: Locator;
+  readonly activationButton: Locator;
 
   constructor(userRow: Locator) {
     this.mainLocator = userRow;
 
-    this.userData = {
-      checkbox: this.mainLocator.locator('#user-row-checkbox input'),
-      status: this.mainLocator.locator('#user-row-status span'),
-      name: this.mainLocator.locator('#user-name-and-surname'),
-      email: this.mainLocator.locator('#user-row-email'),
-      phoneNumber: this.mainLocator.locator('#user-row-phone-number'),
-      contractType: this.mainLocator.locator('#user-row-contract-type'),
-      startTime: this.mainLocator.locator('#user-row-start-time'),
-      endTime: this.mainLocator.locator('#user-row-end-time'),
-      position: this.mainLocator.locator('#user-row-position'),
-      lastUpdated: this.mainLocator.locator('#user-row-last-updated'),
-    };
+    this.userCheckbox = this.mainLocator.locator('#user-row-checkbox input');
+    this.userStatusText = this.mainLocator.locator('#user-row-status span');
+    this.userNameText = this.mainLocator.locator('#user-name-and-surname');
+    this.userEmailText = this.mainLocator.locator('#user-row-email');
+    this.userPhoneNumberText = this.mainLocator.locator('#user-row-phone-number');
+    this.userContractTypeText = this.mainLocator.locator('#user-row-contract-type');
+    this.userStartTimeText = this.mainLocator.locator('#user-row-start-time');
+    this.userEndTimeText = this.mainLocator.locator('#user-row-end-time');
+    this.userPositionText = this.mainLocator.locator('#user-row-position');
+    this.userLastUpdatedText = this.mainLocator.locator('#user-row-last-updated');
 
-    this.actions = {
-      update: this.mainLocator.locator('#table-user-row-update-button'),
-      delete: this.mainLocator.locator('#table-user-row-delete-button'),
-      activation: this.mainLocator.locator('#table-user-row-deactivate-button'),
-    };
+    this.updateButton = this.mainLocator.locator('#table-user-row-update-button');
+    this.deleteButton = this.mainLocator.locator('#table-user-row-delete-button');
+    this.activationButton = this.mainLocator.locator('#table-user-row-deactivate-button');
   }
 
-  async checkUserData(userData: Partial<CreateUserData>) {
-    if (userData.name || userData.surname) await expect(this.userData.name).toHaveText(`${userData.name || ''} ${userData.surname || ''}`);
-    if (userData.email !== undefined) await expect(this.userData.email).toHaveText(userData.email);
+  async checkUserData(userData: Partial<UserData>) {
+    if (userData.name || userData.surname)
+      await expect(this.userNameText).toHaveText(`${userData.name || ''} ${userData.surname || ''}`);
+    if (userData.email !== undefined) await expect(this.userEmailText).toHaveText(userData.email);
 
-    await expect(this.userData.phoneNumber).toHaveText(userData.phoneNumber || '');
-    await expect(this.userData.contractType).toHaveText(userData.contract?.type || '');
-    await expect(this.userData.startTime).toHaveText(userData.contract?.startTime || '');
-    await expect(this.userData.endTime).toHaveText(userData.contract?.endTime || '');
-    await expect(this.userData.position).toHaveText(userData.contract?.position || '');
-    await expect(this.userData.status).toHaveClass(userData.isActivated ? 'text-success' : 'text-danger');
-    await expect(this.userData.lastUpdated).toContainText(todaysDate());
+    await expect(this.userPhoneNumberText).toHaveText(userData.phoneNumber || '');
+    await expect(this.userContractTypeText).toHaveText(userData.contract?.type || '');
+    await expect(this.userStartTimeText).toHaveText(userData.contract?.startTime || '');
+    await expect(this.userEndTimeText).toHaveText(userData.contract?.endTime || '');
+    await expect(this.userPositionText).toHaveText(userData.contract?.position || '');
+    await expect(this.userStatusText).toHaveClass(userData.isActivated ? 'text-success' : 'text-danger');
+    await expect(this.userLastUpdatedText).toContainText(todaysFormattedDate());
   }
 
   async goToUpdateUserView() {
-    await this.actions.update.click();
+    await this.updateButton.click();
   }
 
   async isVisible(isVisible = true) {
