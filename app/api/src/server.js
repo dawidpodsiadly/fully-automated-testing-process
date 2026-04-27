@@ -32,15 +32,12 @@ const mongoUri =
 mongoose
   .connect(mongoUri, {})
   .then(async () => {
-    console.log('DB is connected');
     await createTestUsers();
   })
-  .catch(err => console.log(err));
+  .catch(() => process.exit(1));
 
 app.get('/metrics', metricsHandler);
 app.use(userRoutes);
 
 const PORT = process.env.PORT || 3050;
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+app.listen(PORT, '0.0.0.0');

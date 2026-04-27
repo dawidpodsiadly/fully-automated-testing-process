@@ -19,7 +19,6 @@ const ProtectedRoute = ({element, adminOnly}) => {
 
     return element;
   } catch (error) {
-    console.error('Invalid token:', error);
     return <Navigate to="/login" />;
   }
 };
