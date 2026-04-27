@@ -1,4 +1,4 @@
-import {usersApi} from '../api/users-api';
+import {usersApi} from '../api/users/users.api';
 
 class CleanupService {
   async performFullCleanup() {

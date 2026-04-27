@@ -1,4 +1,4 @@
-export function todaysDate(): string {
+export function todaysFormattedDate(): string {
   const today = new Date();
 
   const year = today.getFullYear();

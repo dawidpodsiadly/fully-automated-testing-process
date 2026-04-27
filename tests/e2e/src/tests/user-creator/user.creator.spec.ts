@@ -1,73 +1,56 @@
-import {expect, test} from '@playwright/test';
+import {test} from '../../fixtures/page-object.fixture';
+import {generateRandomApiUserData} from '../../api/users/users.factory';
+import {usersApi} from '../../api/users/users.api';
+import {generateRandomUserData} from '../../factories/user.factory';
 import {logoutAndLogin, performTestInitialization} from '../../utils/tests.utils';
-import {UserTable} from '../../models/user-table/user-table.model';
-import {UserCreator, CreateUserData} from '../../models/user-creator/user-creator.model';
-import {UserDetails} from '../../models/user-details/user-details.model';
-import {LoginPage} from '../../models/login-page/login-page.model';
 import {NavigationPaths, navigationService} from '../../services/navigation.service';
-import {UnauthorizedView} from '../../models/unauthorized/unauthorized.model';
-import {createUserByApi, generateRandomUserData} from '../../utils/users.utils';
+import {UserData} from '../../types/user.types';
 import {randomUtil} from '../../utils/random.utils';
-import {setText} from '../../utils/input.utils';
 
 test.describe('User Creator', () => {
   test.beforeEach(async ({page}) => {
     await performTestInitialization(page);
   });
 
-  test('Create Activated Admin User', async ({page}) => {
-    const userCreator = new UserCreator(page);
-    const userTable = new UserTable(page);
-    const userDetails = new UserDetails(page);
-
-    const userData = await generateRandomUserData(true, true);
-    await userTable.userHeader.buttons.addUserButton.click();
-    await userCreator.fillUserForm(userData);
+  test('Create Activated Admin User', async ({page, userCreator, userTable, userDetails}) => {
+    const userData = generateRandomUserData(true, true);
+    await userTable.userHeader.addUserButton.click();
+    await userCreator.fillAndSubmitUserForm(userData);
 
     const userRow = await userTable.getRowByEmail(userData.email);
     await userRow.checkUserData(userData);
 
-    await userRow.userData.name.click();
+    await userRow.userNameText.click();
     await userDetails.checkUserData(userData);
 
     await logoutAndLogin(page, userData.email, userData.password);
     await userTable.isVisible();
   });
 
-  test('Create Not Activated Admin User', async ({page}) => {
-    const userCreator = new UserCreator(page);
-    const userTable = new UserTable(page);
-    const userDetails = new UserDetails(page);
-    const loginPage = new LoginPage(page);
-
-    const userData = await generateRandomUserData(true, false);
-    await userTable.userHeader.buttons.addUserButton.click();
-    await userCreator.fillUserForm(userData);
+  test('Create Not Activated Admin User', async ({page, userCreator, userTable, userDetails, loginPage}) => {
+    const userData = generateRandomUserData(true, false);
+    await userTable.userHeader.addUserButton.click();
+    await userCreator.fillAndSubmitUserForm(userData);
 
     const userRow = await userTable.getRowByEmail(userData.email);
     await userRow.checkUserData(userData);
 
-    await userRow.userData.name.click();
+    await userRow.userNameText.click();
     await userDetails.checkUserData(userData);
 
     await logoutAndLogin(page, userData.email, userData.password);
-    await expect(loginPage.errors.deactivatedAccount).toBeVisible();
+    await loginPage.expectError('Your account has been deactivated. Please contact your administrator.');
   });
 
-  test('Create Activated Not Admin User', async ({page}) => {
-    const userCreator = new UserCreator(page);
-    const userTable = new UserTable(page);
-    const userDetails = new UserDetails(page);
-    const unauthorizedView = new UnauthorizedView(page);
-
-    const userData = await generateRandomUserData(false, true);
-    await userTable.userHeader.buttons.addUserButton.click();
-    await userCreator.fillUserForm(userData);
+  test('Create Activated Not Admin User', async ({page, userCreator, userTable, userDetails, unauthorizedView}) => {
+    const userData = generateRandomUserData(false, true);
+    await userTable.userHeader.addUserButton.click();
+    await userCreator.fillAndSubmitUserForm(userData);
 
     const userRow = await userTable.getRowByEmail(userData.email);
     await userRow.checkUserData(userData);
 
-    await userRow.userData.name.click();
+    await userRow.userNameText.click();
     await userDetails.checkUserData(userData);
 
     await logoutAndLogin(page, userData.email, userData.password);
@@ -79,120 +62,114 @@ test.describe('User Creator', () => {
     await navigationService.navigateTo(page, NavigationPaths.USER_CREATE);
     await unauthorizedView.isVisible();
 
-    const apiUserData = await createUserByApi();
-    await navigationService.navigateTo(page, NavigationPaths.USER_EDIT, await apiUserData.id);
+    const apiUserData = generateRandomApiUserData();
+    const createdUser = await usersApi.createUser(apiUserData);
+    await navigationService.navigateTo(page, NavigationPaths.USER_EDIT, createdUser.id);
     await unauthorizedView.isVisible();
   });
 
-  test('Create Deactivated Not Admin User', async ({page}) => {
-    const userCreator = new UserCreator(page);
-    const userTable = new UserTable(page);
-    const userDetails = new UserDetails(page);
-    const loginPage = new LoginPage(page);
-
-    const userData = await generateRandomUserData(false, false);
-    await userTable.userHeader.buttons.addUserButton.click();
-    await userCreator.fillUserForm(userData);
+  test('Create Deactivated Not Admin User', async ({page, userCreator, userTable, userDetails, loginPage}) => {
+    const userData = generateRandomUserData(false, false);
+    await userTable.userHeader.addUserButton.click();
+    await userCreator.fillAndSubmitUserForm(userData);
 
     const userRow = await userTable.getRowByEmail(userData.email);
     await userRow.checkUserData(userData);
 
-    await userRow.userData.name.click();
+    await userRow.userNameText.click();
     await userDetails.checkUserData(userData);
 
     await logoutAndLogin(page, userData.email, userData.password);
-    await expect(loginPage.errors.deactivatedAccount).toBeVisible();
+    await loginPage.expectError('Your account has been deactivated. Please contact your administrator.');
   });
 
-  test('Create User with Only Required Fields (Name, Surname, Email, Password)', async ({page}) => {
-    const userCreator = new UserCreator(page);
-    const userTable = new UserTable(page);
-    const userDetails = new UserDetails(page);
-    const loginPage = new LoginPage(page);
-
-    const userData: CreateUserData = {
+  test('Create User with Only Required Fields (Name, Surname, Email, Password)', async ({
+    page,
+    userCreator,
+    userTable,
+    userDetails,
+    loginPage,
+  }) => {
+    const userData: UserData = {
       name: randomUtil.randomName(),
       surname: randomUtil.randomName(),
       email: randomUtil.randomEmail(),
       password: randomUtil.randomName(),
     };
 
-    await userTable.userHeader.buttons.addUserButton.click();
-    await userCreator.fillUserForm(userData);
+    await userTable.userHeader.addUserButton.click();
+    await userCreator.fillAndSubmitUserForm(userData);
 
     const userRow = await userTable.getRowByEmail(userData.email);
     await userRow.checkUserData(userData);
 
-    await userRow.userData.name.click();
+    await userRow.userNameText.click();
     await userDetails.checkUserData(userData);
 
     await logoutAndLogin(page, userData.email, userData.password);
-    await expect(loginPage.errors.deactivatedAccount).toBeVisible();
+    await loginPage.expectError('Your account has been deactivated. Please contact your administrator.');
   });
 
-  test('Validate User Form Inputs', async ({page}) => {
-    const userCreator = new UserCreator(page);
-    const userTable = new UserTable(page);
+  test('Validate User Form Inputs', async ({userCreator, userTable}) => {
+    const apiUserData = generateRandomApiUserData();
+    const createdUser = await usersApi.createUser(apiUserData);
 
-    const user = await createUserByApi();
-
-    await userTable.userHeader.buttons.addUserButton.click();
-
-    /** Required Inputs **/
+    /** Required inputs **/
+    await userTable.userHeader.addUserButton.click();
     await userCreator.submitForm();
-    await expect(userCreator.errors.requiredName, `Error 'Name is required' Should be Visible`).toBeVisible();
-    await expect(userCreator.errors.requiredSurname, `Error 'Surname is required' Should be Visible`).toBeVisible();
-    await expect(userCreator.errors.requiredEmail, `Error 'Email is required' Should be Visible`).toBeVisible();
-    await expect(userCreator.errors.requiredPassword, `Error 'Password is required' Should be Visible`).toBeVisible();
+    await userCreator.expectError('User Name is required');
+    await userCreator.expectError('Surname is required');
+    await userCreator.expectError('Email is required');
+    await userCreator.expectError('Password is required');
 
-    await setText(userCreator.inputs.name, randomUtil.randomName());
-    await setText(userCreator.inputs.surname, randomUtil.randomName());
-    await setText(userCreator.inputs.email, randomUtil.randomEmail());
+    await userCreator.nameInput.fill(randomUtil.randomName());
+    await userCreator.surnameInput.fill(randomUtil.randomName());
+    await userCreator.emailInput.fill(randomUtil.randomEmail());
 
-    /** Password must be at least 9 characters long && Passwords must match **/
-    await setText(userCreator.inputs.password, randomUtil.randomName(8));
+    /** Password must be at least 9 characters long && passwords must match **/
+    await userCreator.passwordInput.fill(randomUtil.randomName(8));
     await userCreator.submitForm();
-    await expect(userCreator.errors.shortPassword, `Error 'Password must be at least 9 characters long' Should be Visible`).toBeVisible();
-    await expect(userCreator.errors.matchPasswords, `Error 'Passwords must match' Should be Visible`).toBeVisible();
+    await userCreator.expectError('Password must be at least 9 characters long');
+    await userCreator.expectError('Passwords must match');
 
     const password = randomUtil.randomName();
-    await setText(userCreator.inputs.password, password);
-    await setText(userCreator.inputs.confirmPassword, password);
+    await userCreator.passwordInput.fill(password);
+    await userCreator.confirmPasswordInput.fill(password);
 
     /** Your phone number does not exist **/
-    await setText(userCreator.inputs.phoneNumber, randomUtil.randomName());
+    await userCreator.phoneNumberInput.fill(randomUtil.randomName());
     await userCreator.submitForm();
-    await expect(userCreator.errors.phoneNumberNotExist, `Error 'Your phone number does not exist' Should be Visible`).toBeVisible();
-    await setText(userCreator.inputs.phoneNumber, randomUtil.randomPhoneNumber());
+    await userCreator.expectError('Your phone number does not exist');
+    await userCreator.phoneNumberInput.fill(randomUtil.randomPhoneNumber());
 
     /** Salary must be a number **/
-    await setText(userCreator.inputs.salary, randomUtil.randomName());
+    await userCreator.salaryInput.fill(randomUtil.randomName());
     await userCreator.submitForm();
-    await expect(userCreator.errors.salaryMustBeNumber, `Error 'Salary must be a number' Should be Visible`).toBeVisible();
+    await userCreator.expectError('Salary must be a number');
 
-    /** Salary Has to be Without Minus **/
-    await setText(userCreator.inputs.salary, `-${randomUtil.randomStringNumber(4)}`);
+    /** Salary has to be without minus sign **/
+    await userCreator.salaryInput.fill(`-${randomUtil.randomStringNumber(4)}`);
     await userCreator.submitForm();
-    await expect(userCreator.errors.salaryMustBeNumber, `Error 'Salary must be a number' Should be Visible`).toBeVisible();
-    await setText(userCreator.inputs.salary, randomUtil.randomStringNumber(4));
+    await userCreator.expectError('Salary must be a number');
+    await userCreator.salaryInput.fill(randomUtil.randomStringNumber(4));
 
     /** End date must be after start date **/
     const startTime = randomUtil.randomDate();
     const endTime = randomUtil.randomYoungerDate(startTime);
 
-    await setText(userCreator.inputs.endTime, startTime);
-    await setText(userCreator.inputs.startTime, endTime);
+    await userCreator.endTimeInput.fill(startTime);
+    await userCreator.startTimeInput.fill(endTime);
     await userCreator.submitForm();
-    await expect(userCreator.errors.endDateAfterStartDate, `Error 'End date must be after start date' Should be Visible`).toBeVisible();
-    await setText(userCreator.inputs.startTime, startTime);
-    await setText(userCreator.inputs.endTime, endTime);
+    await userCreator.expectError('End date must be after start date');
+    await userCreator.startTimeInput.fill(startTime);
+    await userCreator.endTimeInput.fill(endTime);
 
     /** Email already exists **/
-    await setText(userCreator.inputs.email, user.email);
+    await userCreator.emailInput.fill(createdUser.email);
     await userCreator.submitForm();
-    await expect(userCreator.errors.emailExists, `Error 'Email already exists' Should be Visible`).toBeVisible();
+    await userCreator.expectError('Email already exists');
     const createdUserEmail = randomUtil.randomEmail();
-    await setText(userCreator.inputs.email, createdUserEmail);
+    await userCreator.emailInput.fill(createdUserEmail);
 
     /** User should be created correctly **/
     await userCreator.submitForm();

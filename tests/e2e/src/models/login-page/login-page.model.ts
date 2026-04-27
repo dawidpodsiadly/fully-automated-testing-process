@@ -1,56 +1,36 @@
 import {expect, Locator, Page} from '@playwright/test';
 import {NavigationPaths, navigationService} from '../../services/navigation.service';
-import {setText} from '../../utils/input.utils';
 
 export class LoginPage {
   readonly page: Page;
   readonly mainLocator: Locator;
-
-  readonly inputs: {
-    email: Locator;
-    password: Locator;
-  };
-
-  readonly locators: {
-    loginButton: Locator;
-  };
-
-  readonly errors: {
-    invalidCredentials: Locator;
-    deactivatedAccount: Locator;
-  };
+  readonly emailInput: Locator;
+  readonly passwordInput: Locator;
+  readonly loginButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
     this.mainLocator = this.page.locator('form');
 
-    this.inputs = {
-      email: this.mainLocator.locator('#email'),
-      password: this.mainLocator.locator('#password'),
-    };
-
-    this.locators = {
-      loginButton: this.mainLocator.locator('button[type="submit"]'),
-    };
-
-    this.errors = {
-      invalidCredentials: this.mainLocator.locator('p.text-danger', {hasText: 'Invalid email or password.'}),
-      deactivatedAccount: this.mainLocator.locator('p.text-danger', {hasText: 'Your account has been deactivated. Please contact your administrator.'}),
-    };
+    this.emailInput = this.mainLocator.locator('#email');
+    this.passwordInput = this.mainLocator.locator('#password');
+    this.loginButton = this.mainLocator.locator('button[type="submit"]');
   }
 
   async login(email: string, password: string) {
-    await setText(this.inputs.email, email);
-    await setText(this.inputs.password, password);
-    await this.locators.loginButton.click();
+    await this.emailInput.fill(email);
+    await this.passwordInput.fill(password);
+    await this.loginButton.click();
   }
 
   async expectToBeLoggedIn(isLogged = true) {
     isLogged
       ? await this.page.waitForURL(await navigationService.resolvePath(NavigationPaths.USER_TABLE))
       : await this.page.waitForURL(await navigationService.resolvePath(NavigationPaths.LOGIN));
-    isLogged 
-      ? await expect(this.mainLocator).not.toBeVisible() 
-      : await expect(this.mainLocator).toBeVisible();
+    isLogged ? await expect(this.mainLocator).not.toBeVisible() : await expect(this.mainLocator).toBeVisible();
+  }
+
+  async expectError(errorText: string) {
+    await expect(this.page.locator('p.text-danger', {hasText: errorText})).toBeVisible();
   }
 }
