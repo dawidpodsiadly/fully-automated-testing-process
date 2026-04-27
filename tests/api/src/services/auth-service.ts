@@ -1,6 +1,6 @@
 import request from 'supertest';
 import {PathService} from './path-service';
-import {authBody} from '../utils/bodies.util';
+import {authBody} from '../factories/auth.factory';
 
 export enum TestUsers {
   apiTesterAdmin = 'apitesteradmin@tests.com',
@@ -17,7 +17,7 @@ class AuthService {
     email: string = TestUsers.apiTesterAdmin,
     password: string = testPassword,
   ): Promise<{Authorization: string}> {
-    const response = await request(PathService.paths.auth).post('/').send(authBody(email, password));
+    const response = await request(PathService.paths.auth).post('/').send(authBody({email, password}));
     return {
       Authorization: 'Bearer ' + response.body.token,
     };

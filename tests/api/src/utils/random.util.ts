@@ -1,4 +1,4 @@
-import {ContractTypes, Positions} from './bodies.util';
+import {ContractType, Position} from '../factories/user.factory';
 import {faker} from '@faker-js/faker';
 
 export const bigLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -60,14 +60,14 @@ export class RandomUtil {
     return `api_${this.randomName(10, smallLetters)}@api.pl`;
   }
 
-  randomUserContractType(): ContractTypes {
-    const contractTypes = Object.values(ContractTypes);
+  randomUserContractType(): ContractType {
+    const contractTypes = Object.values(ContractType);
     const randomIndex = this.randomInt(contractTypes.length);
     return contractTypes[randomIndex];
   }
 
-  randomUserPosition(): Positions {
-    const positions = Object.values(Positions);
+  randomUserPosition(): Position {
+    const positions = Object.values(Position);
     const randomIndex = this.randomInt(positions.length);
     return positions[randomIndex];
   }
