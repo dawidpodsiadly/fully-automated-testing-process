@@ -24,9 +24,9 @@ app.use(express.json());
 app.use(passport.initialize());
 app.use(metricsMiddleware);
 
+// Set correct url if you want to use your own mongodb
 const mongoUri =
   process.env.MONGO_URI ||
-  process.env.MONGO_CONNECTION ||
   'mongodb+srv://skill1:e46lecibokiem@users.kon9j2k.mongodb.net/?appName=Users';
 
 mongoose
@@ -34,10 +34,15 @@ mongoose
   .then(async () => {
     await createTestUsers();
   })
-  .catch(() => process.exit(1));
+  .catch(err => {
+    console.error('Failed to connect to MongoDB:', err);
+    process.exit(1);
+  });
 
 app.get('/metrics', metricsHandler);
 app.use(userRoutes);
 
 const PORT = process.env.PORT || 3050;
-app.listen(PORT, '0.0.0.0');
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server is running on port ${PORT}`);
+});
