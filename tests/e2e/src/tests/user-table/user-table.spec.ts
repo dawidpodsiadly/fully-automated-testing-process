@@ -18,8 +18,8 @@ test.describe('User Table', () => {
     const createdUser = await usersApi.createUser(apiUserData);
 
     /** Change to not admin **/
-    const userRow = await userTable.getRowByEmail(createdUser.email);
-    await userRow.goToUpdateUserView();
+    const userTableRow = await userTable.getRowByEmail(createdUser.email);
+    await userTableRow.goToUpdateUserView();
     await userUpdate.updateUserForm({isAdmin: false});
     await logoutAndLogin(page, createdUser.email, createdUser.password);
     await userDetails.isVisible();
@@ -27,7 +27,7 @@ test.describe('User Table', () => {
     /** Change to admin **/
     await logoutAndLogin(page, testUser.email, testUser.password, false);
     await userTable.searchByEmail(createdUser.email);
-    await userRow.goToUpdateUserView();
+    await userTableRow.goToUpdateUserView();
     await userUpdate.updateUserForm({isAdmin: true});
 
     await logoutAndLogin(page, createdUser.email, createdUser.password);
@@ -39,8 +39,8 @@ test.describe('User Table', () => {
     const createdUser = await usersApi.createUser(apiUserData);
 
     /** Change to deactivated **/
-    const userRow = await userTable.getRowByEmail(createdUser.email);
-    await userRow.goToUpdateUserView();
+    const userTableRow = await userTable.getRowByEmail(createdUser.email);
+    await userTableRow.goToUpdateUserView();
     await userUpdate.updateUserForm({isActivated: false});
 
     await logoutAndLogin(page, createdUser.email, createdUser.password);
@@ -49,7 +49,7 @@ test.describe('User Table', () => {
     /** Change to activated **/
     await loginPage.login(testUser.email, testUser.password);
     await userTable.searchByEmail(createdUser.email);
-    await userRow.goToUpdateUserView();
+    await userTableRow.goToUpdateUserView();
     await userUpdate.updateUserForm({isActivated: true});
 
     await logoutAndLogin(page, createdUser.email, createdUser.password);
@@ -72,14 +72,14 @@ test.describe('User Table', () => {
       isAdmin: true,
     };
 
-    const userRow = await userTable.getRowByEmail(createdUser.email);
-    await userRow.updateButton.click();
+    const userTableRow = await userTable.getRowByEmail(createdUser.email);
+    await userTableRow.updateButton.click();
     await userUpdate.clearAllInputs();
     await userUpdate.updateUserForm(updatedUserData);
 
-    const updatedUserRow = await userTable.getRowByEmail(updatedUserData.email);
-    await updatedUserRow.checkUserData(updatedUserData);
-    await updatedUserRow.userNameText.click();
+    const updatedUserTableRow = await userTable.getRowByEmail(updatedUserData.email);
+    await updatedUserTableRow.checkUserData(updatedUserData);
+    await updatedUserTableRow.userNameText.click();
     await userDetails.checkUserData(updatedUserData);
 
     /** User should log in with old password **/
@@ -94,8 +94,8 @@ test.describe('User Table', () => {
     const apiUserData = generateRandomApiUserData(false, false);
     const createdUser = await usersApi.createUser(apiUserData);
 
-    const userRow = await userTable.getRowByEmail(createdUser.email);
-    await userRow.updateButton.click();
+    const userTableRow = await userTable.getRowByEmail(createdUser.email);
+    await userTableRow.updateButton.click();
 
     /** Required inputs **/
     await userUpdate.clearAllInputs();
@@ -160,15 +160,15 @@ test.describe('User Table', () => {
     const createdUser = await usersApi.createUser(apiUserData);
     const updatedUserData = generateRandomUserData();
 
-    const userRow = await userTable.getRowByEmail(createdUser.email);
-    await userRow.updateButton.click();
+    const userTableRow = await userTable.getRowByEmail(createdUser.email);
+    await userTableRow.updateButton.click();
     await userUpdate.clearAllInputs();
     await userUpdate.updateUserForm(updatedUserData);
 
     /** User should be updated correctly **/
-    const updatedUserRow = await userTable.getRowByEmail(updatedUserData.email);
-    await updatedUserRow.checkUserData(updatedUserData);
-    await updatedUserRow.userNameText.click();
+    const updatedUserTableRow = await userTable.getRowByEmail(updatedUserData.email);
+    await updatedUserTableRow.checkUserData(updatedUserData);
+    await updatedUserTableRow.userNameText.click();
     await userDetails.checkUserData(updatedUserData);
 
     /** User should log in with new credentials **/
@@ -182,18 +182,18 @@ test.describe('User Table', () => {
     const apiUserData2 = generateRandomApiUserData();
     const createdUser2 = await usersApi.createUser(apiUserData2);
 
-    const userRow1 = await userTable.getRowByEmail(createdUser1.email);
-    await userRow1.userCheckbox.click();
-    const userRow2 = await userTable.getRowByEmail(createdUser2.email);
-    await userRow2.userCheckbox.click();
+    const userTableRow1 = await userTable.getRowByEmail(createdUser1.email);
+    await userTableRow1.userCheckbox.click();
+    const userTableRow2 = await userTable.getRowByEmail(createdUser2.email);
+    await userTableRow2.userCheckbox.click();
 
     await userTable.deleteSelectedUsersButton.click();
     await userTable.deleteUserDialog.confirmDelete();
 
     await userTable.searchByEmail(createdUser1.email);
-    await userRow1.isVisible(false);
+    await userTableRow1.isVisible(false);
     await userTable.searchByEmail(createdUser2.email);
-    await userRow2.isVisible(false);
+    await userTableRow2.isVisible(false);
   });
 
   test('Activate/Deactivate Action - Activate/Deactivate User', async ({page, userTable, loginPage}) => {
@@ -201,31 +201,31 @@ test.describe('User Table', () => {
     const createdUser = await usersApi.createUser(apiUserData);
 
     /** Deactivate user **/
-    const userRow1 = await userTable.getRowByEmail(createdUser.email);
-    await userRow1.activationButton.click();
+    const userTableRow = await userTable.getRowByEmail(createdUser.email);
+    await userTableRow.activationButton.click();
     await logoutAndLogin(page, createdUser.email, createdUser.password);
     await loginPage.expectError('Your account has been deactivated. Please contact your administrator.');
 
     /** Activate user **/
     await loginPage.login(testUser.email, testUser.password);
     await userTable.searchByEmail(createdUser.email);
-    await expect(userRow1.userStatusText).toHaveClass('text-danger');
-    await userRow1.activationButton.click();
+    await expect(userTableRow.userStatusText).toHaveClass('text-danger');
+    await userTableRow.activationButton.click();
 
     await logoutAndLogin(page, createdUser.email, createdUser.password);
     await userTable.searchByEmail(createdUser.email);
-    await expect(userRow1.userStatusText).toHaveClass('text-success');
+    await expect(userTableRow.userStatusText).toHaveClass('text-success');
   });
 
   test('Delete Action - Delete User', async ({page, userTable, loginPage}) => {
     const apiUserData = generateRandomApiUserData();
     const createdUser = await usersApi.createUser(apiUserData);
 
-    const userRow1 = await userTable.getRowByEmail(createdUser.email);
-    await userRow1.deleteButton.click();
+    const userTableRow = await userTable.getRowByEmail(createdUser.email);
+    await userTableRow.deleteButton.click();
     await userTable.deleteUserDialog.confirmDelete();
     await userTable.searchByEmail(createdUser.email);
-    await userRow1.isVisible(false);
+    await userTableRow.isVisible(false);
 
     await logoutAndLogin(page, createdUser.email, createdUser.password);
     await loginPage.expectError('Invalid email or password.');
