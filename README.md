@@ -4,6 +4,20 @@ This project demonstrates a fully automated process for building, deploying and 
 
 The application is deployed from the repository to a Kubernetes test environment and then automatically verified by both API and E2E tests executed directly in the CI/CD pipeline. The application can then be monitored using Grafana dashboards and Prometheus.
 
+## Project Preview
+
+### Application
+![Application Preview](images/app.gif)
+
+### GitLab CI/CD Pipeline
+![GitLab Pipeline](images/gitlab.png)
+
+### Deployment
+![Deployment](images/deployment.png)
+
+### Monitoring
+![Grafana Dashboard](images/grafana.png)
+
 ## How the Process Works
 
 Everything is automated using GitLab pipelines. The full flow is shown below:
@@ -12,8 +26,8 @@ Everything is automated using GitLab pipelines. The full flow is shown below:
 2. Docker images are pushed to `Google Artifact Registry`
 3. Helm charts are packaged and published to the `OCI` registry
 4. Helmfile deploys the `test-installation` environment to `Google Kubernetes Engine (GKE)`
-5. `50` API tests are executed against on deployed application
-6. `17` E2E tests are executed against on deployed application
+5. `50` API tests are executed against the deployed application
+6. `17` E2E tests are executed against the deployed application
 7. Application health and runtime metrics are monitored with `Grafana` and `Prometheus`
 
 ## Technologies
