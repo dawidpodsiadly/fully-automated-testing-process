@@ -5,7 +5,12 @@ api-tests:
     - echo "Running API tests"
     - cd tests/api
     - npm ci
-    - npm run test:all
+    - npm run test:all -- --json --outputFile=test-report.json
+  artifacts:
+    when: always
+    expire_in: 1 week
+    paths:
+      - tests/api/test-report.json
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: >-
