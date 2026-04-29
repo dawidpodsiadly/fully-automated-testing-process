@@ -17,10 +17,10 @@ test.describe('User Creator', () => {
     await userTable.userHeader.addUserButton.click();
     await userCreator.fillAndSubmitUserForm(userData);
 
-    const userRow = await userTable.getRowByEmail(userData.email);
-    await userRow.checkUserData(userData);
+    const userTableRow = await userTable.getRowByEmail(userData.email);
+    await userTableRow.checkUserData(userData);
 
-    await userRow.userNameText.click();
+    await userTableRow.userNameText.click();
     await userDetails.checkUserData(userData);
 
     await logoutAndLogin(page, userData.email, userData.password);
@@ -32,10 +32,10 @@ test.describe('User Creator', () => {
     await userTable.userHeader.addUserButton.click();
     await userCreator.fillAndSubmitUserForm(userData);
 
-    const userRow = await userTable.getRowByEmail(userData.email);
-    await userRow.checkUserData(userData);
+    const userTableRow = await userTable.getRowByEmail(userData.email);
+    await userTableRow.checkUserData(userData);
 
-    await userRow.userNameText.click();
+    await userTableRow.userNameText.click();
     await userDetails.checkUserData(userData);
 
     await logoutAndLogin(page, userData.email, userData.password);
@@ -47,10 +47,10 @@ test.describe('User Creator', () => {
     await userTable.userHeader.addUserButton.click();
     await userCreator.fillAndSubmitUserForm(userData);
 
-    const userRow = await userTable.getRowByEmail(userData.email);
-    await userRow.checkUserData(userData);
+    const userTableRow = await userTable.getRowByEmail(userData.email);
+    await userTableRow.checkUserData(userData);
 
-    await userRow.userNameText.click();
+    await userTableRow.userNameText.click();
     await userDetails.checkUserData(userData);
 
     await logoutAndLogin(page, userData.email, userData.password);
@@ -73,10 +73,10 @@ test.describe('User Creator', () => {
     await userTable.userHeader.addUserButton.click();
     await userCreator.fillAndSubmitUserForm(userData);
 
-    const userRow = await userTable.getRowByEmail(userData.email);
-    await userRow.checkUserData(userData);
+    const userTableRow = await userTable.getRowByEmail(userData.email);
+    await userTableRow.checkUserData(userData);
 
-    await userRow.userNameText.click();
+    await userTableRow.userNameText.click();
     await userDetails.checkUserData(userData);
 
     await logoutAndLogin(page, userData.email, userData.password);
@@ -100,10 +100,10 @@ test.describe('User Creator', () => {
     await userTable.userHeader.addUserButton.click();
     await userCreator.fillAndSubmitUserForm(userData);
 
-    const userRow = await userTable.getRowByEmail(userData.email);
-    await userRow.checkUserData(userData);
+    const userTableRow = await userTable.getRowByEmail(userData.email);
+    await userTableRow.checkUserData(userData);
 
-    await userRow.userNameText.click();
+    await userTableRow.userNameText.click();
     await userDetails.checkUserData(userData);
 
     await logoutAndLogin(page, userData.email, userData.password);
@@ -173,7 +173,7 @@ test.describe('User Creator', () => {
 
     /** User should be created correctly **/
     await userCreator.submitForm();
-    const userRow = await userTable.getRowByEmail(createdUserEmail);
-    await userRow.isVisible();
+    const userTableRow = await userTable.getRowByEmail(createdUserEmail);
+    await userTableRow.isVisible();
   });
 });

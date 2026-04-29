@@ -41,10 +41,10 @@ export class UserTable {
 
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
       await this.searchByEmail(userEmail);
-      const userRow = this.mainLocator.locator('#table-user-row').filter({hasText: userEmail});
+      const userTableRow = this.mainLocator.locator('#table-user-row').filter({hasText: userEmail});
 
-      if ((await userRow.count()) > 0) {
-        return new UserTableRow(userRow);
+      if ((await userTableRow.count()) > 0) {
+        return new UserTableRow(userTableRow);
       }
 
       if (attempt < maxAttempts) {
