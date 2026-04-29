@@ -25,5 +25,5 @@ kubectl port-forward -n test-installation svc/monitoring-grafana 3000:80
 
 Prometheus:
 ```bash
-kubectl port-forward -n test-installation svc/prometheus-monitoring-kube-prometheus-prometheus 9090:9090
+kubectl port-forward -n test-installation svc/monitoring-kube-prometheus-prometheus 9090:9090
 ```
